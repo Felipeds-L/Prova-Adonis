@@ -1,4 +1,5 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
+const nodemailer = require('nodemailer')
 import User from 'App/Models/User';
 import Bet from 'App/Models/Bet';
 
@@ -58,6 +59,41 @@ export default class UsersController {
 
 
     return {User: user, Bets: bets}
+  }
+
+  public async sendMail({ auth, response }: HttpContextContract){
+    const user = await User.findOrFail(auth.user?.id)
+
+    let transport = nodemailer.createTransport({
+      host: "smtp.mailtrap.io",
+      port: 2525,
+      auth: {
+        user: "583128b8852a7b",
+        pass: "495b0a35ecc53b"
+      }
+    });
+
+    let message = {
+      from: "noreply@milk.com",
+      to: user.email,
+      subject: "Recuperação de Senha",
+      text: `Prezado(a) ${user.username}. \n\n segue abaixo informações para que possa recuperar sua senha. \n\n`,
+      html: `<p>Prezado(a) ${user.username}.<br><br> segue abaixo informações para que possa recuperar sua senha.<br><br></p>`
+    };
+
+    transport.sendMail(message, function(err) {
+      if(err){
+        return response.status(400).json({
+          erro: true,
+          message: "Email can't bee sent"
+        })
+      }
+    })
+
+    return response.send({
+      error: false,
+      message: 'Email sent correctly'
+    })
   }
 
 }

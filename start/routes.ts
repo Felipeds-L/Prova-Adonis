@@ -22,6 +22,7 @@ Route.group(() =>{
 
   Route.get('users/me', 'UsersController.showUserBet')
   Route.resource('/users', 'UsersController')
+  Route.post('/users/email','UsersController.sendMail')
 
   Route.get('/myBets', 'BetsController.myBets')
   Route.resource('/bet', 'BetsController')
