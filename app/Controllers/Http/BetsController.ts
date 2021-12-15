@@ -12,19 +12,19 @@ export default class BetsController {
   }
 
   public async store({ request, auth }: HttpContextContract) {
-    const data = await request.only(['user_id','game_id', 'bet'])
+    const data = await request.only(['user_id','game_id', 'number_choosed'])
     const game = await Game.findOrFail(data.game_id)
     const user = await User.findOrFail(auth.user?.id)
 
-    if(game.max_number === data.bet.length){
+    if(game.max_number === data.number_choosed.length){
       const bet = await Bet.create({
         user_id: user.id,
         game_id: data.game_id,
-        bet: data.bet
+        numbers_choosed: data.number_choosed
       })
       return {bet: bet}
     }else{
-      return `Error: você deve selecionar ${game.max_number} números, nesse jogo. Você selecionou ${data.bet.length}`
+      return `Error: você deve selecionar ${game.max_number} números, nesse jogo. Você selecionou ${data.number_choosed.length}`
     }
 
   }
@@ -53,8 +53,9 @@ export default class BetsController {
   }
 
   public async myBets({ auth }: HttpContextContract){
-    const bet = await Bet.findBy('user_id', auth.user?.id)
-    return bet
+    const bet = await Bet.findByOrFail('user_id', auth.user?.id)
+    const bets = await (await Bet.query().where('user_id', bet.id))
+    return bets
   }
 
   public async compareListas(lista1, lista2){

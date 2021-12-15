@@ -1,7 +1,7 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
-export default class Bets extends BaseSchema {
-  protected tableName = 'bets'
+export default class UserLevelAccesses extends BaseSchema {
+  protected tableName = 'user_level_accesses'
 
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
@@ -11,12 +11,11 @@ export default class Bets extends BaseSchema {
         .unsigned()
         .references('users.id')
         .onDelete('CASCADE')
-      table
-        .integer('game_id')
+        table
+        .integer('level_access_id')
         .unsigned()
-        .references('games.id')
+        .references('level_accesses.id')
         .onDelete('CASCADE')
-      table.string('numbers_choosed')
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
     })

@@ -1,18 +1,12 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
 
-export default class Bet extends BaseModel {
+export default class Cart extends BaseModel {
   @column({ isPrimary: true })
   public id: number
 
   @column()
-  public user_id: number
-
-  @column()
-  public game_id: number
-
-  @column()
-  public numbers_choosed: string
+  public min_cart_value: number
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

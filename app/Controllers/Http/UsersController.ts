@@ -10,29 +10,54 @@ export default class UsersController {
   }
 
   public async store({request}: HttpContextContract) {
-    const data = request.only(['email', 'username', 'password', 'level_access'])
+    const data = request.only(['email', 'username', 'password'])
     const user = await User.create(data)
 
     return user;
   }
-  // só está retornando uma unica aposta
+
   public async show({ params }: HttpContextContract) {
     const user = await User.findOrFail(params.id)
 
     return user
   }
 
-  public async edit({}: HttpContextContract) {}
+  public async update({ params, request }: HttpContextContract) {
+    const user = await User.findOrFail(params.id)
+    const data = request.only(['email', 'username', 'password'])
 
-  public async update({}: HttpContextContract) {}
+    try{
+      user.merge(data)
+      await user.save()
+      return {updated: user}
+    }catch{
+      return {Error: "Error to update user datas"}
+    }
 
-  public async destroy({}: HttpContextContract) {}
+  }
+
+  public async destroy({ auth, params }: HttpContextContract) {
+    const userLogged = await User.findOrFail(auth.user?.id)
+
+    if(userLogged === params.id){
+      try{
+        userLogged.delete()
+        return { Deleted: true}
+      }catch{
+        return {Error: 'Error on delete user'}
+      }
+    }else{
+      return {Error: `The user who's logged is not the one that you are trying delete`}
+    }
+  }
 
   public async showUserBet({ auth }: HttpContextContract){
     const user = await User.findOrFail(auth.user?.id)
     const bet = await Bet.findByOrFail('user_id', auth.user?.id)
-    const bets = await Bet.query().where('user_id', bet.id)
+    const bets = await (await Bet.query().where('user_id', bet.id))
+
 
     return {User: user, Bets: bets}
   }
+
 }

@@ -18,8 +18,19 @@ Route.group(() => {
 }).prefix('/api')
 
 Route.group(() =>{
-  Route.resource('/bet', 'BetsController')
+
+
   Route.get('users/me', 'UsersController.showUserBet')
-  Route.get('/myBets', 'BetsController.myBets')
   Route.resource('/users', 'UsersController')
+
+  Route.get('/myBets', 'BetsController.myBets')
+  Route.resource('/bet', 'BetsController')
+
+  Route.resource('/games', 'GamesController')
+
+  Route.resource('/level_access', 'LevelAccessesController')
+
+  Route.resource('/user_level_access', 'UserLevelAccessesController')
+
+
 }).middleware('auth')

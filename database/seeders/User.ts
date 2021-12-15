@@ -8,7 +8,6 @@ export default class UserSeeder extends BaseSeeder {
         email: 'felipe@leite.com',
         username: 'SrMilk',
         password: 'MyPassword',
-        level_access: true
       },
       {
         email: 'tayna@vieira.com',
@@ -24,7 +23,6 @@ export default class UserSeeder extends BaseSeeder {
         email: 'daniel@vieira.com',
         username: 'Corno',
         password: 'Ass Whole',
-        level_access: true
       }
     ])
   }
