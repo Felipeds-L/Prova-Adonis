@@ -57,8 +57,15 @@ export default class UsersController {
   public async showUserBet({ auth }: HttpContextContract){
     const user = await User.findOrFail(auth.user?.id)
     const bets = await Bet.query().where('user_id', user.id)
+    let dateNow = new Date();
 
-    return {User: user, Bets: bets}
+    let bestMonth = []
+    bets.forEach((bet) => {
+      if(bet.createdAt.month === (dateNow.getMonth())+1){
+        console.log(bet.id)
+      }
+    })
+    // return {User: user, Bets: bets}
   }
 
   public async sendMail({ auth, response }: HttpContextContract){

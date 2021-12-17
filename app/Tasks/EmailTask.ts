@@ -7,7 +7,7 @@ const nodemailer = require('nodemailer');
 export default class EmailTask extends BaseTask {
 	public static get schedule() {
 
-		return '40 * * * * *'
+		return '20 * * * * *'
 	}
 	/**
 	 * Set enable use .lock file for block run retry task
@@ -18,16 +18,10 @@ export default class EmailTask extends BaseTask {
 	}
 
 	public async handle() {
-    const user = await User.all()
-    user.forEach((user) => {
-
-      // await console.log(this.diferenceBetweenDates(user.id))
-      // const bets = Bet.findByOrFail('user_id', user.id)
-      // console.log(bets)
-      // const now = new Date();
-      console.log('days:' + user.createdAt)
-    })
-    // this.logger.info('Handled')
+    const users = await User.all()
+    for (let x =0;x<users.length;x++){
+      console.log(await users[x])
+    }
   }
 
   public async sendMail(){
