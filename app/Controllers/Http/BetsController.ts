@@ -53,8 +53,8 @@ export default class BetsController {
   }
 
   public async myBets({ auth }: HttpContextContract){
-    const bet = await Bet.findByOrFail('user_id', auth.user?.id)
-    const bets = await (await Bet.query().where('user_id', bet.id))
+    const user = await User.findOrFail(auth.user?.id)
+    const bets = await Bet.query().where('user_id', user.id)
     return bets
   }
 

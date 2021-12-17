@@ -1,5 +1,7 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
-const nodemailer = require('nodemailer')
+const nodemailer = require('nodemailer');
+
+
 import User from 'App/Models/User';
 import Bet from 'App/Models/Bet';
 
@@ -54,16 +56,13 @@ export default class UsersController {
 
   public async showUserBet({ auth }: HttpContextContract){
     const user = await User.findOrFail(auth.user?.id)
-    const bet = await Bet.findByOrFail('user_id', auth.user?.id)
-    const bets = await (await Bet.query().where('user_id', bet.id))
-
+    const bets = await Bet.query().where('user_id', user.id)
 
     return {User: user, Bets: bets}
   }
 
   public async sendMail({ auth, response }: HttpContextContract){
     const user = await User.findOrFail(auth.user?.id)
-
     let transport = nodemailer.createTransport({
       host: "smtp.mailtrap.io",
       port: 2525,
@@ -94,6 +93,19 @@ export default class UsersController {
       error: false,
       message: 'Email sent correctly'
     })
+  }
+
+  public async calculateLastBet({ auth }: HttpContextContract){
+    const user = await User.findOrFail(auth.user?.id)
+    const bets = await Bet.query().where('user_id', user.id)
+    this.diferenceBetweenDates(bets[bets.length-1].createdAt)
+    return {Bets: bets[bets.length-1]}
+  }
+
+  public async diferenceBetweenDates(date){
+    const now = new Date();
+    let diference = Math.abs(now.getTime() - date);
+    const days = Math.ceil(diference / (1000 * 60 * 60 * 24))
   }
 
 }
