@@ -4,8 +4,9 @@ const nodemailer = require('nodemailer');
 
 import User from 'App/Models/User';
 import Bet from 'App/Models/Bet';
+import UserLevelAccess from 'App/Models/UserLevelAccess';
 
-export default class UsersController {
+export default class UsersController{
   public async index({}: HttpContextContract) {
     const user = await User.all()
 
@@ -13,10 +14,15 @@ export default class UsersController {
   }
 
   public async store({request}: HttpContextContract) {
-    const data = request.only(['email', 'username', 'password'])
+    const data = await request.only(['email', 'username', 'password'])
     const user = await User.create(data)
+    const user_level_data = request.only(['level_access'])
+    const user_level = await UserLevelAccess.create({
+      user_id: user.id,
+      level_access_id: user_level_data.level_access
+    })
 
-    return user;
+    return {user: user, level_access: user_level}
   }
 
   public async show({ params }: HttpContextContract) {
@@ -59,7 +65,7 @@ export default class UsersController {
     const bets = await Bet.query().where('user_id', user.id)
     let dateNow = new Date();
 
-    let bestMonth = []
+
     bets.forEach((bet) => {
       if(bet.createdAt.month === (dateNow.getMonth())+1){
         console.log(bet.id)
@@ -100,19 +106,6 @@ export default class UsersController {
       error: false,
       message: 'Email sent correctly'
     })
-  }
-
-  public async calculateLastBet({ auth }: HttpContextContract){
-    const user = await User.findOrFail(auth.user?.id)
-    const bets = await Bet.query().where('user_id', user.id)
-    this.diferenceBetweenDates(bets[bets.length-1].createdAt)
-    return {Bets: bets[bets.length-1]}
-  }
-
-  public async diferenceBetweenDates(date){
-    const now = new Date();
-    let diference = Math.abs(now.getTime() - date);
-    const days = Math.ceil(diference / (1000 * 60 * 60 * 24))
   }
 
 }

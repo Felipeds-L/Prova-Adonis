@@ -1,5 +1,7 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Game from 'App/Models/Game'
+import User from 'App/Models/User';
+import UserLevelAccess from 'App/Models/UserLevelAccess';
 
 export default class GamesController {
   public async index({}: HttpContextContract) {
@@ -8,16 +10,24 @@ export default class GamesController {
     return {games: game};
   }
 
-  public async store({ request }: HttpContextContract) {
-    const data = await request.only(['type', 'description', 'range', 'price', 'max_number', 'color'])
+  public async store({ request, auth }: HttpContextContract) {
+    const user = await User.findOrFail(auth.user?.id)
+    const user_level = await UserLevelAccess.findOrFail(user.id)
 
-   try{
-    const game = await Game.create(data);
-    return {created_game: game}
+    if(user_level.level_access_id === 1){
+      const data = await request.only(['type', 'description', 'range', 'price', 'max_number', 'color'])
 
-   }catch{
-     return {error: 'Error on create a new game'}
-   }
+      try{
+        const game = await Game.create(data);
+        return {created_game: game}
+
+      }catch{
+        return {error: 'Error on create a new game'}
+      }
+    }else{
+      return {Error: 'you can not create a game'}
+    }
+
   }
 
   public async show({ params }: HttpContextContract) {
