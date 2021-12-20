@@ -11,7 +11,7 @@ import Route from '@ioc:Adonis/Core/Route'
 
 Route.group(() => {
   Route.get('/', async () => {
-
+    return {Obi_Message: 'Hello There!'}
   })
 
   Route.post('login', 'AuthController.login')
@@ -20,19 +20,21 @@ Route.group(() => {
 
 Route.group(() =>{
 
-
-  Route.get('users/me', 'UsersController.showUserBet')
-  Route.resource('/users', 'UsersController')
-  Route.post('/users/email','UsersController.sendMail')
+  // Users Routes
+  Route.put('/users', 'UsersController.update')
+  Route.get('users', 'UsersController.index')
+  Route.get('/users/:id', 'UsersController.show')
+  Route.delete('/users', 'UsersController.delete')
+  Route.post('/users/forgot-password','UsersController.forgotPassword')
   Route.get('/my-last-bet', 'UsersController.calculateLastBet')
+  Route.get('/myBets', 'UsersController.myBets')
 
-  Route.get('/myBets', 'BetsController.myBets')
+
   Route.resource('/bet', 'BetsController')
 
   Route.resource('/games', 'GamesController')
 
   Route.resource('/level_access', 'LevelAccessesController')
-
   Route.resource('/user_level_access', 'UserLevelAccessesController')
 
 
