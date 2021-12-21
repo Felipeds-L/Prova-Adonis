@@ -1,14 +1,5 @@
 import Route from '@ioc:Adonis/Core/Route'
 
-
-/*
-  RF02 - Concluido
-  RF03 - Concluido - parcial
-  RF04 - Concluido - parcial
-*/
-
-
-
 Route.group(() => {
   Route.get('/', async () => {
     return {Obi_Message: 'Hello There!'}

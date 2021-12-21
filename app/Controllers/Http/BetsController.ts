@@ -35,7 +35,7 @@ export default class BetsController {
       this.newBet(user.id)
       return {bet: bet}
     }else{
-      return `Error: você deve selecionar ${game.max_number} números, nesse jogo. Você selecionou ${data.number_choosed.length}`
+      return {Error: `You need select ${game.max_number} numbers on this game. you've selected ${data.number_choosed.length}`}
     }
 
   }
@@ -44,6 +44,7 @@ export default class BetsController {
     const user = await User.findOrFail(auth.user?.id)
     const bet = await Bet.findOrFail(params.id)
     if(user.id === bet.user_id){
+      console.log(bet.numbers_choosed)
       return {Bet: bet}
     }else{
       return {Error: 'Your are trying access a bet whos the owner is not you.'}

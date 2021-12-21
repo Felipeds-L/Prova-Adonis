@@ -2,6 +2,7 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Game from 'App/Models/Game'
 import User from 'App/Models/User';
 import UserLevelAccess from 'App/Models/UserLevelAccess';
+import GameNameValidator from 'App/Validators/GameNameValidator';
 
 export default class GamesController {
   public async index({}: HttpContextContract) {
@@ -11,6 +12,7 @@ export default class GamesController {
   }
 
   public async store({ request, auth }: HttpContextContract) {
+    await request.validate(GameNameValidator)
     const user = await User.findOrFail(auth.user?.id)
     const user_level = await UserLevelAccess.findByOrFail('user_id', user.id)
 
@@ -25,7 +27,7 @@ export default class GamesController {
         return {error: 'Error on create a new game'}
       }
     }else{
-      return {Error: 'you can not create a game'}
+      return {Error: 'Only Administrators can create a game'}
     }
 
   }

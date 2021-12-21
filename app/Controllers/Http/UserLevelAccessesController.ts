@@ -24,7 +24,7 @@ export default class UserLevelAccessesController {
     if(user_level.level_access_id === 1){
       try{
         const user_level = await UserLevelAccess.create({
-          user_id: user.id,
+          user_id: data.user_id,
           level_access_id: data.level_access_id
         })
 

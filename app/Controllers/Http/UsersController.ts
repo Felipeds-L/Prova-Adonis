@@ -3,16 +3,28 @@ const nodemailer = require('nodemailer');
 import User from 'App/Models/User';
 import Bet from 'App/Models/Bet';
 import UserLevelAccess from 'App/Models/UserLevelAccess';
+import EmailValidator from 'App/Validators/EmailValidator';
+import UserNameValidator from 'App/Validators/UserNameValidator';
 
 export default class UsersController{
-  public async index({}: HttpContextContract) {
+  public async index({ auth }: HttpContextContract) {
     const user = await User.all()
-
-    return user
+    const user_level = await UserLevelAccess.findByOrFail('user_id', auth.user?.id)
+    if(user_level.level_access_id === 1){
+      try{
+        return {User: user}
+      }catch{
+        return {Error: `Problem on trying bring all users, please try again!`}
+      }
+    }else{
+      return {Error: `Only Administrators can see all user information`}
+    }
   }
 
   public async store({request}: HttpContextContract) {
 
+    await request.validate(EmailValidator)
+    await request.validate(UserNameValidator)
 
     const data = await request.only(['email', 'username', 'password'])
     const user = await User.create(data)
@@ -27,22 +39,35 @@ export default class UsersController{
     return {user: user, level_access: user_level}
   }
 
-  public async show({ params }: HttpContextContract) {
+  public async show({ params, auth }: HttpContextContract) {
     const user = await User.findOrFail(params.id)
+    const user_level = await UserLevelAccess.findByOrFail('user_id', auth.user?.id)
+    if(user_level.level_access_id === 1){
+      try{
+        let lastWeek = (24*60*60*1000)*30
+        let currentDate = new Date()
+        let lastWeekDate = new Date()
+        lastWeekDate.setTime(lastWeekDate.getTime()-lastWeek)
 
-    let lastWeek = (24*60*60*1000)*30
-    let currentDate = new Date()
-    let lastWeekDate = new Date()
-    lastWeekDate.setTime(lastWeekDate.getTime()-lastWeek)
+        const bets = await Bet.query().where('user_id', user.id).whereBetween('created_at', [lastWeekDate, currentDate])
 
-    const bets = await Bet.query().where('user_id', user.id).whereBetween('created_at', [lastWeekDate, currentDate])
+        return {User: user, Bets: bets}
+      }catch{
+        return {Error: `Wasn't possible bring the user information, please try again!`}
+      }
+    }else{
+      return {Error: `Only Administrators can see another user information`}
+    }
 
-    return {User: user, Bets: bets}
   }
 
   public async update({ request, auth }: HttpContextContract) {
     const user = await User.findOrFail(auth.user?.id)
     const data = request.only(['email', 'username', 'password'])
+    await request.validate(UserNameValidator)
+    await request.validate(EmailValidator)
+
+
     try{
       user.merge(data)
       await user.save()
