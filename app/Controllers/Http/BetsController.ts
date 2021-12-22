@@ -2,7 +2,6 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 const nodemailer = require('nodemailer');
 
 import Bet from 'App/Models/Bet'
-import Game from 'App/Models/Game'
 import User from 'App/Models/User'
 import UserLevelAccess from 'App/Models/UserLevelAccess';
 
@@ -22,21 +21,17 @@ export default class BetsController {
   }
 
   public async store({ request, auth }: HttpContextContract) {
-    const data = await request.only(['user_id','game_id', 'number_choosed'])
-    const game = await Game.findOrFail(data.game_id)
+    const data = await request.only(['game_id', 'numbers_choosed'])
+
     const user = await User.findOrFail(auth.user?.id)
 
-    if(game.max_number === data.number_choosed.length){
       const bet = await Bet.create({
         user_id: user.id,
         game_id: data.game_id,
-        numbers_choosed: data.number_choosed
+        numbers_choosed: data.numbers_choosed
       })
       this.newBet(user.id)
       return {bet: bet}
-    }else{
-      return {Error: `You need select ${game.max_number} numbers on this game. you've selected ${data.number_choosed.length}`}
-    }
 
   }
 

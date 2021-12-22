@@ -13,7 +13,7 @@ Route.group(() =>{
 
   // Users Routes
   Route.put('/users', 'UsersController.update')
-  Route.get('users', 'UsersController.index')
+  Route.get('/users', 'UsersController.index')
   Route.get('/users/:id', 'UsersController.show')
   Route.delete('/users', 'UsersController.delete')
   Route.post('/users/forgot-password','UsersController.forgotPassword')
