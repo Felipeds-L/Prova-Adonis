@@ -4,9 +4,9 @@ RNF01. Construir toda aplicação utilizando Adonis V5 - Feita
 
 RNF02. Construir banco de dados com base no JSON (Em Anexo) - Feita
 
-RNF03. Utilizar validators - Em desenvolvimento
+RNF03. Utilizar validators - Feito
 
-RNF04. Utilizar Docker para manter a aplicação dentro de um container. - Indisponível no momento
+RNF04. Utilizar Docker para manter a aplicação dentro de um container. - Feito
 
 RF01. Disparar email para novos usuários, recuperação de senha e novas apostas - Feita
 
