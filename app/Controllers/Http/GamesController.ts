@@ -101,6 +101,8 @@ export default class GamesController {
       }catch{
         return {error: 'Game do not found'}
       }
+    }else{
+      return {Error: 'Only Administrators can delete a game!'}
     }
 
   }

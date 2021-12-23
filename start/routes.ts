@@ -28,5 +28,7 @@ Route.group(() =>{
   Route.resource('/level_access', 'LevelAccessesController')
   Route.resource('/user_level_access', 'UserLevelAccessesController')
 
+  Route.resource('/cart', 'CartsController')
+
 
 }).middleware('auth')
