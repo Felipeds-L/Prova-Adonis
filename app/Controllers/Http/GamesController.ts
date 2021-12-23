@@ -13,10 +13,17 @@ export default class GamesController {
 
   public async store({ request, auth }: HttpContextContract) {
     await request.validate(GameNameValidator)
-    const user = await User.findOrFail(auth.user?.id)
-    const user_level = await UserLevelAccess.findByOrFail('user_id', user.id)
+    const logged = await User.findOrFail(auth.user?.id)
+    const user_level = await UserLevelAccess.query().where('user_id', logged.id)
 
-    if(user_level.level_access_id === 1){
+    let isAdministrator = false
+    user_level.forEach((level) => {
+      if(level.level_access_id === 1){
+        isAdministrator = true
+      }
+    })
+
+    if(isAdministrator){
       const data = await request.only(['type', 'description', 'range', 'price', 'max_number', 'color'])
 
       try{
@@ -43,9 +50,16 @@ export default class GamesController {
   }
 
   public async update({ params, request, auth}: HttpContextContract) {
-    const user = await User.findOrFail(auth.user?.id)
-    const user_level = await UserLevelAccess.findByOrFail('user_id', user.id)
-    if(user_level.level_access_id === 1){
+    const logged = await User.findOrFail(auth.user?.id)
+    const user_level = await UserLevelAccess.query().where('user_id', logged.id)
+
+    let isAdministrator = false
+    user_level.forEach((level) => {
+      if(level.level_access_id === 1){
+        isAdministrator = true
+      }
+    })
+    if(isAdministrator){
       try{
         const data = await request.only(['type', 'description', 'range', 'price', 'max_number', 'color'])
         const game = await Game.findOrFail(params.id)
@@ -65,9 +79,17 @@ export default class GamesController {
   }
 
   public async destroy({ params, auth }: HttpContextContract) {
-    const user = await User.findOrFail(auth.user?.id)
-    const user_level = await UserLevelAccess.findByOrFail('user_id', user.id)
-    if(user_level.level_access_id === 1){
+    const logged = await User.findOrFail(auth.user?.id)
+    const user_level = await UserLevelAccess.query().where('user_id', logged.id)
+
+    let isAdministrator = false
+    user_level.forEach((level) => {
+      if(level.level_access_id === 1){
+        isAdministrator = true
+      }
+    })
+
+    if(isAdministrator){
       try{
         const game = await Game.findOrFail(params.id)
         try{

@@ -15,7 +15,7 @@ Route.group(() =>{
   Route.put('/users', 'UsersController.update')
   Route.get('/users', 'UsersController.index')
   Route.get('/users/:id', 'UsersController.show')
-  Route.delete('/users', 'UsersController.delete')
+  Route.delete('/users', 'UsersController.destroy')
   Route.post('/users/forgot-password','UsersController.forgotPassword')
   Route.get('/my-last-bet', 'UsersController.calculateLastBet')
   Route.get('/myBets', 'UsersController.myBets')

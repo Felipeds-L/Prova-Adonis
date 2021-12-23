@@ -9,8 +9,17 @@ import UserNameValidator from 'App/Validators/UserNameValidator';
 export default class UsersController{
   public async index({ auth }: HttpContextContract) {
     const user = await User.all()
-    const user_level = await UserLevelAccess.findByOrFail('user_id', auth.user?.id)
-    if(user_level.level_access_id === 1){
+    const logged = await User.findOrFail(auth.user?.id)
+    const user_level = await UserLevelAccess.query().where('user_id', logged.id)
+
+    let isAdministrator = false
+    user_level.forEach((level) => {
+      if(level.level_access_id === 1){
+        isAdministrator = true
+      }
+    })
+
+    if(isAdministrator){
       try{
         return {User: user}
       }catch{
@@ -41,8 +50,17 @@ export default class UsersController{
 
   public async show({ params, auth }: HttpContextContract) {
     const user = await User.findOrFail(params.id)
-    const user_level = await UserLevelAccess.findByOrFail('user_id', auth.user?.id)
-    if(user_level.level_access_id === 1){
+    const logged = await User.findOrFail(auth.user?.id)
+    const user_level = await UserLevelAccess.query().where('user_id', logged.id)
+
+    let isAdministrator = false
+    user_level.forEach((level) => {
+      if(level.level_access_id === 1){
+        isAdministrator = true
+      }
+    })
+
+    if(isAdministrator){
       try{
         let lastWeek = (24*60*60*1000)*30
         let currentDate = new Date()
@@ -78,19 +96,17 @@ export default class UsersController{
 
   }
 
-  public async destroy({ auth, params }: HttpContextContract) {
+  public async destroy({ auth}: HttpContextContract) {
     const userLogged = await User.findOrFail(auth.user?.id)
 
-    if(userLogged === params.id){
-      try{
-        userLogged.delete()
-        return { Deleted: true}
-      }catch{
-        return {Error: 'Error on delete user'}
-      }
-    }else{
-      return {Error: `The user who's logged is not the one that you are trying delete`}
+
+    try{
+      userLogged.delete()
+      return { Deleted: true}
+    }catch{
+      return {Error: 'Error on delete user'}
     }
+
   }
 
   public async myBets({ auth }: HttpContextContract){

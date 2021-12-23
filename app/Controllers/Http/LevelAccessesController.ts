@@ -6,10 +6,17 @@ import UserLevelAccess from 'App/Models/UserLevelAccess'
 export default class LevelAccessesController {
   public async index({auth}: HttpContextContract) {
     const level = await LevelAccess.all()
-    const user = await User.findOrFail(auth.user?.id)
-    const user_level = await UserLevelAccess.findByOrFail('user_id', user.id)
+    const logged = await User.findOrFail(auth.user?.id)
+    const user_level = await UserLevelAccess.query().where('user_id', logged.id)
 
-    if(user_level.level_access_id === 1){
+    let isAdministrator = false
+    user_level.forEach((level) => {
+      if(level.level_access_id === 1){
+        isAdministrator = true
+      }
+    })
+
+    if(isAdministrator){
       return {level_access: level}
     }else{
       return {Error: 'Only Administrators can see all level_access!'}
@@ -19,9 +26,16 @@ export default class LevelAccessesController {
 
   public async store({ request, auth }: HttpContextContract) {
     const data = await request.only(['level'])
-    const user = await User.findOrFail(auth.user?.id)
-    const user_level = await UserLevelAccess.findByOrFail('user_id', user.id)
-    if(user_level.level_access_id === 1){
+    const logged = await User.findOrFail(auth.user?.id)
+    const user_level = await UserLevelAccess.query().where('user_id', logged.id)
+
+    let isAdministrator = false
+    user_level.forEach((level) => {
+      if(level.level_access_id === 1){
+        isAdministrator = true
+      }
+    })
+    if(isAdministrator){
       try{
         const level = await LevelAccess.create(data)
         return {created: true, level_access: level}
@@ -33,23 +47,42 @@ export default class LevelAccessesController {
     }
   }
 
-  public async show({ params }: HttpContextContract) {
-    try{
-      const level = await LevelAccess.findOrFail(params.id)
+  public async show({ params, auth }: HttpContextContract) {
+    const logged = await User.findOrFail(auth.user?.id)
+    const user_level = await UserLevelAccess.query().where('user_id', logged.id)
 
-      return {level_access: level}
-    }catch{
-      return {Error: 'Level_Access do not found!'}
+    let isAdministrator = false
+    user_level.forEach((level) => {
+      if(level.level_access_id === 1){
+        isAdministrator = true
+      }
+    })
+    if(isAdministrator){
+      try{
+        const level = await LevelAccess.findOrFail(params.id)
+
+        return {level_access: level}
+      }catch{
+        return {Error: 'Level_Access do not found!'}
+      }
     }
+
   }
 
   public async update({ params, request, auth }: HttpContextContract) {
     const level = await LevelAccess.findOrFail(params.id)
     const data = await request.only(['level'])
-    const user = await User.findOrFail(auth.user?.id)
-    const user_level = await UserLevelAccess.findByOrFail('user_id', user.id)
+    const logged = await User.findOrFail(auth.user?.id)
+    const user_level = await UserLevelAccess.query().where('user_id', logged.id)
 
-    if(user_level.level_access_id === 1){
+    let isAdministrator = false
+    user_level.forEach((level) => {
+      if(level.level_access_id === 1){
+        isAdministrator = true
+      }
+    })
+
+    if(isAdministrator){
       try{
         level.merge(data)
         await level.save()
@@ -66,10 +99,17 @@ export default class LevelAccessesController {
 
   public async destroy({ params, auth }: HttpContextContract) {
     const level = await LevelAccess.findOrFail(params.id)
-    const user = await User.findOrFail(auth.user?.id)
-    const user_level = await UserLevelAccess.findByOrFail('user_id', user.id)
+    const logged = await User.findOrFail(auth.user?.id)
+    const user_level = await UserLevelAccess.query().where('user_id', logged.id)
 
-    if(user_level.level_access_id === 1){
+    let isAdministrator = false
+    user_level.forEach((level) => {
+      if(level.level_access_id === 1){
+        isAdministrator = true
+      }
+    })
+
+    if(isAdministrator){
       try{
         level.delete()
         return {Deleted: true}

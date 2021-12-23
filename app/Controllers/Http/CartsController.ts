@@ -46,10 +46,17 @@ export default class CartsController {
     const cart = await Cart.findOrFail(params.id)
     const data = await request.only(['min_cart_value'])
 
-    const user = await User.findOrFail(auth.user?.id)
-    const user_level = await UserLevelAccess.findByOrFail('user_id', user.id)
+    const logged = await User.findOrFail(auth.user?.id)
+    const user_level = await UserLevelAccess.query().where('user_id', logged.id)
 
-    if(user_level.level_access_id === 1){
+    let isAdministrator = false
+    user_level.forEach((level) => {
+      if(level.level_access_id === 1){
+        isAdministrator = true
+      }
+    })
+
+    if(isAdministrator){
       try{
         cart.merge(data)
         await cart.save()
@@ -63,14 +70,26 @@ export default class CartsController {
     }
   }
 
-  public async destroy({ params }: HttpContextContract) {
-    try{
-      const cart = await Cart.findOrFail(params.id)
-      cart.delete()
+  public async destroy({ params, auth }: HttpContextContract) {
+    const logged = await User.findOrFail(auth.user?.id)
+    const user_level = await UserLevelAccess.query().where('user_id', logged.id)
 
-      return {Deleted: true}
-    }catch{
-      return {Deleted: false, Error: 'Erron on try delete the cart'}
+    let isAdministrator = false
+    user_level.forEach((level) => {
+      if(level.level_access_id === 1){
+        isAdministrator = true
+      }
+    })
+    if(isAdministrator){
+      try{
+        const cart = await Cart.findOrFail(params.id)
+        cart.delete()
+
+        return {Deleted: true}
+      }catch{
+        return {Deleted: false, Error: 'Erron on try delete the cart'}
+      }
     }
+
   }
 }
