@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, column} from '@ioc:Adonis/Lucid/Orm'
 
 export default class Game extends BaseModel {
   @column({ isPrimary: true })
@@ -17,7 +17,7 @@ export default class Game extends BaseModel {
   @column()
   public price: number
 
-  @column()
+  @column({ serializeAs: 'max-number' })
   public max_number: number
 
   @column()

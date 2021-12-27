@@ -1,17 +1,24 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Cart from 'App/Models/Cart';
 import Game from 'App/Models/Game'
 import User from 'App/Models/User';
 import UserLevelAccess from 'App/Models/UserLevelAccess';
 import GameNameValidator from 'App/Validators/GameNameValidator';
 
 export default class GamesController {
-  public async index({}: HttpContextContract) {
-    const game = await Game.all();
+  public async index({ response }: HttpContextContract) {
+    try{
+      const games = await Game.query();
+      const gamesJSON = games.map((game) => game.serialize())
+      const cart = await Cart.query().select('id', 'min_cart_value').first();
 
-    return {games: game};
+      return response.status(200).json({'min-cart-value': cart?.min_cart_value, types: gamesJSON})
+    }catch{
+      return response.status(406).json({Error: 'Any Game has been found!'})
+    }
   }
 
-  public async store({ request, auth }: HttpContextContract) {
+  public async store({ request, auth, response }: HttpContextContract) {
     await request.validate(GameNameValidator)
     const logged = await User.findOrFail(auth.user?.id)
     const user_level = await UserLevelAccess.query().where('user_id', logged.id)
@@ -28,13 +35,13 @@ export default class GamesController {
 
       try{
         const game = await Game.create(data);
-        return {created_game: game}
+        return response.status(200).json({created_game: game})
 
       }catch{
-        return {error: 'Error on create a new game'}
+        return response.status(400).json({error: 'Error on create a new game'})
       }
     }else{
-      return {Error: 'Only Administrators can create a game'}
+      return response.status(403).json({Error: 'Only Administrators can create a game'})
     }
 
   }
@@ -49,7 +56,7 @@ export default class GamesController {
     }
   }
 
-  public async update({ params, request, auth}: HttpContextContract) {
+  public async update({ params, request, response, auth}: HttpContextContract) {
     const logged = await User.findOrFail(auth.user?.id)
     const user_level = await UserLevelAccess.query().where('user_id', logged.id)
 
@@ -68,17 +75,17 @@ export default class GamesController {
           await game.save()
           return {game: game}
         }catch{
-          return {Error: `Error on update game ${game.id}`}
+          return response.status(400).json({Error: `Error on update game ${game.id}`})
         }
       }catch{
         return {Error: 'Game not found, or column invalid'}
       }
     }else{
-      return {Error: `You don't have permission to change a game, ask for the administrator.`}
+      return response.status(403).json({Error: `You don't have permission to change a game, ask for the administrator.`})
     }
   }
 
-  public async destroy({ params, auth }: HttpContextContract) {
+  public async destroy({ params, auth, response }: HttpContextContract) {
     const logged = await User.findOrFail(auth.user?.id)
     const user_level = await UserLevelAccess.query().where('user_id', logged.id)
 
@@ -96,13 +103,13 @@ export default class GamesController {
           game.delete()
           return {deleted: true}
         }catch{
-          return {Error: 'Error on delete game'}
+          return response.status(200).json({Error: 'Error on delete game'})
         }
       }catch{
-        return {error: 'Game do not found'}
+        return response.status(400).json({error: 'Game do not found'})
       }
     }else{
-      return {Error: 'Only Administrators can delete a game!'}
+      return response.status(403).json({Error: 'Only Administrators can delete a game!'})
     }
 
   }

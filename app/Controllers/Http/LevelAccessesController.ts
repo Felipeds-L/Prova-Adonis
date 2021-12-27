@@ -4,7 +4,7 @@ import User from 'App/Models/User'
 import UserLevelAccess from 'App/Models/UserLevelAccess'
 
 export default class LevelAccessesController {
-  public async index({auth}: HttpContextContract) {
+  public async index({auth, response}: HttpContextContract) {
     const level = await LevelAccess.all()
     const logged = await User.findOrFail(auth.user?.id)
     const user_level = await UserLevelAccess.query().where('user_id', logged.id)
@@ -17,14 +17,14 @@ export default class LevelAccessesController {
     })
 
     if(isAdministrator){
-      return {level_access: level}
+      return response.status(200).json({level_access: level})
     }else{
-      return {Error: 'Only Administrators can see all level_access!'}
+      return response.status(403).json({Error: 'Only Administrators can see all level_access!'})
     }
 
   }
 
-  public async store({ request, auth }: HttpContextContract) {
+  public async store({ request, auth, response }: HttpContextContract) {
     const data = await request.only(['level'])
     const logged = await User.findOrFail(auth.user?.id)
     const user_level = await UserLevelAccess.query().where('user_id', logged.id)
@@ -38,16 +38,16 @@ export default class LevelAccessesController {
     if(isAdministrator){
       try{
         const level = await LevelAccess.create(data)
-        return {created: true, level_access: level}
+        return response.status(200).json({created: true, level_access: level})
       }catch{
-        return {created: false, Error: 'Error on create a new level access'}
+        return response.status(500).json({created: false, Error: 'Error on create a new level access'})
       }
     }else{
-      return {Error: 'Only Administrators can create a new access_level!'}
+      return response.status(403).json({Error: 'Only Administrators can create a new access_level!'})
     }
   }
 
-  public async show({ params, auth }: HttpContextContract) {
+  public async show({ params, auth, response }: HttpContextContract) {
     const logged = await User.findOrFail(auth.user?.id)
     const user_level = await UserLevelAccess.query().where('user_id', logged.id)
 
@@ -61,15 +61,17 @@ export default class LevelAccessesController {
       try{
         const level = await LevelAccess.findOrFail(params.id)
 
-        return {level_access: level}
+        return response.status(200).json({level_access: level})
       }catch{
-        return {Error: 'Level_Access do not found!'}
+        return response.status(500).json({Error: 'Level_Access do not found!'})
       }
+    }else{
+      return response.status(403).json({Error: 'Only Administrators can see the Level_Accesses'})
     }
 
   }
 
-  public async update({ params, request, auth }: HttpContextContract) {
+  public async update({ params, request, response, auth }: HttpContextContract) {
     const level = await LevelAccess.findOrFail(params.id)
     const data = await request.only(['level'])
     const logged = await User.findOrFail(auth.user?.id)
@@ -87,17 +89,17 @@ export default class LevelAccessesController {
         level.merge(data)
         await level.save()
 
-        return {updated: true, level_access: level}
+        return response.status(200).json({updated: true, level_access: level})
       }catch{
-        return {Error: 'Error on update level_access'}
+        return response.status(500).json({Error: 'Error on update level_access'})
       }
     }else{
-      return {Error: 'Only Administrators can update level_accesses!'}
+      return response.status(403).json({Error: 'Only Administrators can update level_accesses!'})
     }
 
   }
 
-  public async destroy({ params, auth }: HttpContextContract) {
+  public async destroy({ params, auth, response }: HttpContextContract) {
     const level = await LevelAccess.findOrFail(params.id)
     const logged = await User.findOrFail(auth.user?.id)
     const user_level = await UserLevelAccess.query().where('user_id', logged.id)
@@ -112,12 +114,12 @@ export default class LevelAccessesController {
     if(isAdministrator){
       try{
         level.delete()
-        return {Deleted: true}
+        return response.status(200).json({Deleted: true})
       }catch{
-        return {Error: 'Error on delete access_level'}
+        return response.status(500).json({Error: 'Error on delete access_level'})
       }
     }else{
-      return {Error: 'Only Administrators can delete a level_access!'}
+      return response.status(403).json({Error: 'Only Administrators can delete a level_access!'})
     }
   }
 }

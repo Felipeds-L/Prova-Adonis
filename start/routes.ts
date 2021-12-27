@@ -6,6 +6,8 @@ Route.group(() => {
   })
 
   Route.post('login', 'AuthController.login')
+  Route.post('/users/forgot-password','UsersController.forgotPassword')
+  Route.post('/users/reset-password','UsersController.resetPassword')
   Route.post('/users', 'UsersController.store')
 }).prefix('/api')
 
@@ -16,7 +18,6 @@ Route.group(() =>{
   Route.get('/users', 'UsersController.index')
   Route.get('/users/:id', 'UsersController.show')
   Route.delete('/users', 'UsersController.destroy')
-  Route.post('/users/forgot-password','UsersController.forgotPassword')
   Route.get('/my-last-bet', 'UsersController.calculateLastBet')
   Route.get('/myBets', 'UsersController.myBets')
 

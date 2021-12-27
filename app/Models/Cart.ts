@@ -5,7 +5,7 @@ export default class Cart extends BaseModel {
   @column({ isPrimary: true })
   public id: number
 
-  @column()
+  @column({serializeAs: 'min-cart-value' })
   public min_cart_value: number
 
   @column.dateTime({ autoCreate: true })
