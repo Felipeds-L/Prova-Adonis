@@ -38,9 +38,6 @@ export default class BetsController {
     if(sum_price >= cart_value){
       const user = await User.findOrFail(auth.user?.id)
 
-
-
-
       let isBetAlreadyMade = false
       let inBetAlreadyExists = false
 
