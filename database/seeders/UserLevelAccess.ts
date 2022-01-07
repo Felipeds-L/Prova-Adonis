@@ -21,6 +21,10 @@ export default class UserLevelAccessSeeder extends BaseSeeder {
       },
       {
         user_id: 4,
+        level_access_id: 1
+      },
+      {
+        user_id: 4,
         level_access_id: 2
       }
     ])

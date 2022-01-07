@@ -1,4 +1,5 @@
 import { HttpServer } from "@adonisjs/core/build/src/Ignitor/HttpServer";
+import execa from "execa";
 import getPort from "get-port";
 import { configure } from "japa";
 import { join } from "path";
@@ -11,7 +12,22 @@ sourceMapSupport.install({ handleUncaughtExceptions: false });
 
 export let app: HttpServer;
 
+async function runMigrations() {
+  await execa.node('ace', ['migration:run'], {
+    stdio: 'inherit',
+  })
+}
+async function runSeeders(){
+  await execa.node("ace", ["db:seed"], {
+    stdio: "inherit",
+  });
+}
 
+async function rollbackMigrations() {
+  await execa.node("ace", ["migration:rollback"], {
+    stdio: "inherit",
+  });
+}
 
 async function startHttpServer() {
   const { Ignitor } = await import("@adonisjs/core/build/src/Ignitor");
@@ -26,6 +42,6 @@ async function stopHttpServer() {
 
 configure({
   files: ["test/**/*.spec.ts"],
-  before: [startHttpServer],
-  after: [stopHttpServer],
+  before: [runMigrations, runSeeders ,startHttpServer],
+  after: [stopHttpServer, rollbackMigrations],
 });

@@ -1,22 +1,36 @@
 import test from 'japa'
 import supertest from 'supertest'
-const baseUrl = `http://localhost:3333`
 import User from '../app/Models/User'
 
-let token = ''
+const baseUrl = `http://localhost:3333`
+
 
 test.group('Auth', () =>{
   test('testing authentication', async () => {
+
     const user = new User()
-    user.email = 'tddteste01@tdd.teste'
-    user.password = 'tdd_password'
+    user.email = 'daniel@vieira.com'
+    user.password = 'Man'
 
-    const logged = await supertest(baseUrl).post('/api/login').send(user).expect(200);
+    await supertest(baseUrl).post('/api/login').send(user).expect(200);
+  });
 
-    const json_log = JSON.parse(logged.text)
+  test('authentication failure, password is wrong', async() => {
 
-    token = json_log['token']['token']
+    const user = new User()
+    user.email = 'daniel@vieira.com'
+    user.password = 'Girl'
 
+    await supertest(baseUrl).post('/api/login').send(user).expect(401);
+  });
+
+  test('authentication failure, email is wrong', async() => {
+
+    const user = new User()
+    user.email = 'tayna@vieira.com'
+    user.password = 'Man'
+
+    await supertest(baseUrl).post('/api/login').send(user).expect(401);
   });
 })
 

@@ -49,7 +49,7 @@ export default class UsersController{
       const find_user = await User.findByOrFail('email', data.email)
       const find_level = await UserLevelAccess.findByOrFail('user_id', find_user.id)
       const find_leve_name = await LevelAccess.findOrFail(find_level.level_access_id)
-      this.congratSingIn(user.id)
+      // this.congratSingIn(user.id)
 
       return response.status(200).json({created: true, user: user.username, level_access: find_leve_name.level})
     }catch{

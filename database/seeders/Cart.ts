@@ -5,7 +5,7 @@ export default class CartSeeder extends BaseSeeder {
   public async run () {
     await Cart.createMany([
       {
-        min_cart_value: 30
+        min_cart_value: 15
       }
     ])
   }
